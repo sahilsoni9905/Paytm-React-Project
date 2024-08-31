@@ -9,10 +9,10 @@ const JWT_SECRET = require("../config");
 const { authMiddleware } = require("../middleware");
 
 const signupBody = zod.object({
-    username: zod.string().email(),
-    firstName: zod.string(),
-    lastName: zod.string(),
-    password: zod.string()
+    username: zod.string(),
+	firstName: zod.string(),
+	lastName: zod.string(),
+	password: zod.string()
 })
 
 router.post("/signup", async (req, res) => {
@@ -61,7 +61,7 @@ router.post("/signup", async (req, res) => {
 
 const signinBody = zod.object({
     username: zod.string().email(),
-    password: zod.string()
+	password: zod.string()
 })
 
 router.post("/signin", async (req, res) => {
