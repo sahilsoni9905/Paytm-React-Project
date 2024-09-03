@@ -60,7 +60,7 @@ router.post("/signup", async (req, res) => {
 
 
 const signinBody = zod.object({
-    username: zod.string().email(),
+    username: zod.string(),
 	password: zod.string()
 })
 
@@ -119,11 +119,11 @@ router.put("/update", authMiddleware, async (req, res) => {
 
 
 router.get("/bulk", async (req, res) => {
-    const filter = req.query.filter || "";
+    const filter = req.body.filter || "";
 
     const users = await User.find({
         $or: [{
-            firstName: {
+            username: {
                 "$regex": filter
             }
         }, {
