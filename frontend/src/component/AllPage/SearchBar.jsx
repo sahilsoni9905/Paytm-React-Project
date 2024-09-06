@@ -15,15 +15,16 @@ const SearchBar = () => {
             if (debouncedSearchedTerm) {
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await axios.get(
-                        `http://localhost:3000/api/v1/user/bulk?filter=${encodeURIComponent(debouncedSearchedTerm)}`,
+                    const response = await axios.post(
+                        'http://localhost:3000/api/v1/user/bulk',
+                        { filter: debouncedSearchedTerm }, // Sending the search term in the request body
                         {
                             headers: {
                                 Authorization: `Bearer ${token}`,
                             },
                         }
                     );
-                    console.log(response.data.user)
+                    console.log(response.data.user);
                     setAppearedUser(response.data.user);
                 } catch (error) {
                     console.log("Error searching", error);
@@ -46,7 +47,7 @@ const SearchBar = () => {
                 <input
                     type="text"
                     placeholder="Type to search..."
-                    className="w-full pl-10 pr-3 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring focus:border-blue-300"
+                    className="w-full pl-10 pr-3 py-2 rounded-full border border-gray-300 "
                     onChange={handleInputChange}
                 />
 
@@ -63,13 +64,12 @@ const SearchBar = () => {
                                     </div>
                                 </div>
                                 {index !== appearedUser.length - 1 && (
-                                    <hr className=" bg-gray-700 h-0.5  mx-4 my-0.5 w-3/4 rounded-xl" />
+                                    <hr className="bg-gray-700 h-0.5 mx-4 my-0.5 w-3/4 rounded-xl" />
                                 )}
                             </div>
                         ))}
                     </div>
                 )}
-
             </div>
 
             <div className='flex items-center justify-center p-2'>

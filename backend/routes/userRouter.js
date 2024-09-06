@@ -118,7 +118,7 @@ router.put("/update", authMiddleware, async (req, res) => {
 });
 
 
-router.get("/bulk", async (req, res) => {
+router.post("/bulk", async (req, res) => {
     const filter = req.body.filter || "";
 
     const users = await User.find({
@@ -127,7 +127,7 @@ router.get("/bulk", async (req, res) => {
                 "$regex": filter
             }
         }, {
-            lastName: {
+            firstName: {
                 "$regex": filter
             }
         }]
