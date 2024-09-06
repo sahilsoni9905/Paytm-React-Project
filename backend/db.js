@@ -5,27 +5,30 @@ mongoose.connect("mongodb+srv://sahil:sahilsoni123@cluster0.8bn7b.mongodb.net/?r
 
 
 const transactionSchema = new mongoose.Schema({
-    oldBalance : {
-        type : Number,
-        required : true,
+    oldBalance: {
+        type: Number,
+        required: true,
     },
-    newBalance : {
-        type : Number , 
-        required : true,
+    newBalance: {
+        type: Number,
+        required: true,
     },
-    transferWithPersonName : {
-        type : String,
-        required : true,
+    transferWithPersonName: {
+        type: String,
+        required: true,
     },
-    transactionAmount : {
-        type : Number,
-        required : true,
+    transactionAmount: {
+        type: Number,
+        required: true,
     },
-    MoneySent : {
-        type : Number ,
-        required : true,
+    MoneySent: {
+        type: Number,
+        required: true,
+    },
+    msgAttached: {
+        type: String,
     }
-} , { timestamps: true })
+}, { timestamps: true })
 
 // Create a Schema for Users
 const userSchema = new mongoose.Schema({
@@ -54,12 +57,12 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxLength: 50
     },
-    transactions :  [transactionSchema],
-} , { timestamps: true });
+    transactions: [transactionSchema],
+}, { timestamps: true });
 
 const accountSchema = new mongoose.Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId, 
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -73,10 +76,10 @@ const accountSchema = new mongoose.Schema({
 
 const Account = mongoose.model('Account', accountSchema);
 const User = mongoose.model('User', userSchema);
-const Transaction = mongoose.model('Transaction' , transactionSchema);
+const Transaction = mongoose.model('Transaction', transactionSchema);
 
 module.exports = {
-	User,
+    User,
     Account,
     Transaction,
 };
