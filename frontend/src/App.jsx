@@ -4,7 +4,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import SignUp from './pages/Signup.jsx';
 import SignIn from './pages/Signin.jsx';
-import DashBoard from './pages/DashBoard.jsx';
+import Pay from './component/User/Pay.jsx';
+import Transaction from './component/User/Transaction.jsx';
+import Balance from './component/User/Balance.jsx';
+import People from './component/User/People.jsx';
+import Account from './component/User/Account.jsx';
+import User from './pages/User.jsx';
+import Dashboard from './component/User/Dashboard.jsx';
+
 
 function App() {
   return (
@@ -14,7 +21,14 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/signup' element={<SignUp />} />
           <Route path='/signin' element={<SignIn />} />
-          <Route path='/dashboard' element={<SignIn />} />
+          <Route path='/user' element={<User />}>
+          <Route path='dashboard' element={<Dashboard />}/>
+          <Route path='pay' element={<Pay/>}/>
+          <Route path='transactions' element={<Transaction/>}/>
+          <Route path='balance' element={<Balance/>}/>
+          <Route path='recipients' element={<People/>}/>
+          <Route path='account' element={<Account/>}/>
+          </Route>
         </Routes>
       </BrowserRouter>
     </div>

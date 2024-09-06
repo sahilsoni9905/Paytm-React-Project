@@ -2,7 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+    origin: 'http://localhost:5173', // Specify the origin
+    credentials: true, // Allow credentials
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const mainRouter = require("./routes");
