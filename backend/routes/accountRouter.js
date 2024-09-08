@@ -6,13 +6,23 @@ const { default: mongoose } = require('mongoose');
 
 const router = express.Router();
 
-router.get("/balance", authMiddleware, async (req, res) => {
+router.post("/balance", authMiddleware, async (req, res) => {
     const account = await Account.findOne({
         userId: req.userId
     });
+    const user = await User.findOne({
+        _id : req.userId
+    })
+    let userSubmittedPassword = req.body.password;
+    if(user != null && user.password == userSubmittedPassword){
+        res.json({
+            balance: account.balance
+        })
+    }
+    else
 
     res.json({
-        balance: account.balance
+        msg: "bhaag yha s",
     })
 });
 
