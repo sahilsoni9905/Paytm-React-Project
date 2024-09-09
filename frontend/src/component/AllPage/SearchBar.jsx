@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { useDebounce } from 'use-debounce';
+import { useNavigate } from 'react-router-dom';
 
 const SearchBar = () => {
     const [show, setShow] = useState(false);
     const [searchedTerm, setSearchedTerm] = useState('');
     const [appearedUser, setAppearedUser] = useState([]);
     const [debouncedSearchedTerm] = useDebounce(searchedTerm, 200);
+    const navigate=useNavigate()
 
     useEffect(() => {
         const getUser = async () => {
@@ -17,7 +19,7 @@ const SearchBar = () => {
                     const token = localStorage.getItem('token');
                     const response = await axios.post(
                         'http://localhost:3000/api/v1/user/bulk',
-                        { filter: debouncedSearchedTerm }, // Sending the search term in the request body
+                        { filter: debouncedSearchedTerm }, 
                         {
                             headers: {
                                 Authorization: `Bearer ${token}`,
@@ -39,9 +41,13 @@ const SearchBar = () => {
     const handleInputChange = (e) => {
         setSearchedTerm(e.target.value);
     };
+    const LogoutHandle=()=>{
+        localStorage.removeItem('token');
+        navigate('/')
+    }
 
     return (
-        <div className="relative flex w-full justify-evenly items-center gap-4 px-4 py-2 bg-white shadow-md rounded-lg">
+        <div className=" flex w-full justify-evenly items-center gap-4 px-4 py-2 bg-white shadow-md rounded-lg">
             <div className="relative w-full">
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
@@ -80,7 +86,7 @@ const SearchBar = () => {
 
             {show && (
                 <div className="absolute top-12 right-5 mt-2 w-38 bg-gray-900 shadow-lg rounded-lg p-4">
-                    <button className="w-full shadow-md flex items-center justify-start gap-4 font-bold px-4 py-2 hover:bg-gray-700 text-white rounded-b-lg">
+                    <button onClick={LogoutHandle} className="w-full shadow-md flex items-center justify-start gap-4 font-bold px-4 py-2 hover:bg-gray-700 text-white rounded-b-lg">
                         Logout
                         <MdLogout />
                     </button>

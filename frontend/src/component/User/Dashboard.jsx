@@ -74,7 +74,8 @@ const Dashboard = () => {
     }, []);
 
     return (
-        <div className="bg-slate-800 flex flex-col items-center justify-start lg:h-[93.3vh] p-4">
+        <div className='lg:h-[93.1vh] overflow-y-hidden overflow-y-scroll'>
+            <div className="bg-slate-800 flex flex-col items-center justify-start  lg:h-[93.1vh] p-4">
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
                 <div className="lg:col-span-2 bg-gray-800 p-6 md:p-8 rounded-lg shadow-xl shadow-slate-900 text-white">
                     <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 lg:mb-8">
@@ -134,13 +135,15 @@ const Dashboard = () => {
                     <h2 className="text-lg md:text-xl lg:text-2xl font-semibold mb-4 flex items-center">
                         <FaBell className="mr-2" /> Notifications
                     </h2>
-                    <ul className="space-y-4">
+                    <hr className="bg-gray-700 h-0.5 shadow-sm shadow-black  my-0.5 w-3/5  rounded-xl" />
+                    <ul className="space-y-2 mt-6">
                         {notifications.map((notification, index) => (
-                            <li key={index} className="border-b border-gray-700 pb-2">
+                            <li key={index} className="border-b border-gray-700 pb-2 flex flex-col items-center justify-center gap-4">
                                 <div className="text-md md:text-lg lg:text-xl font-semibold">
                                     {notification.message}
                                 </div>
-                                <div className="text-sm text-gray-400">{notification.time}</div>
+                                <div className="text-sm text-gray-400 self-start">{notification.time}</div>
+                                <hr className="bg-gray-700 h-1 shadow-sm shadow-black  my-0.5 w-full  rounded-xl" />
                             </li>
                         ))}
                     </ul>
@@ -213,7 +216,8 @@ const Dashboard = () => {
                         }
                     }}
                 />
-            </div>
+            </div> 
+        </div>
         </div>
     );
 };

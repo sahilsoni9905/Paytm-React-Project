@@ -3,11 +3,15 @@ import { NavLink } from 'react-router-dom';
 import { FaHome, FaMoneyBill, FaUser, FaExchangeAlt, FaUsers ,FaTimes , FaRegListAlt, FaSignOutAlt, FaBars } from 'react-icons/fa';
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { GiWallet } from "react-icons/gi";
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
-
-
+    const navigate=useNavigate()
+    const LogoutHandle=()=>{
+        localStorage.removeItem('token');
+        navigate('/')
+    }
     return (
         <div className="flex">
             <div className="hidden lg:flex flex-col bg-gray-900 text-white w-96 p-6 h-screen">
@@ -81,10 +85,10 @@ const Sidebar = () => {
                     <FaUser />
                     <span className="ml-6">Account</span>
                 </NavLink>
-                <div className="flex items-center mt-auto text-2xl font-bold p-4 rounded-lg hover:bg-gray-700 hover:text-red-400 cursor-pointer">
+                <button onClick={LogoutHandle} className="flex items-center mt-auto text-2xl font-bold p-4 rounded-lg hover:bg-gray-700 hover:text-red-400 cursor-pointer">
                     <FaSignOutAlt />
                     <span className="ml-6">Quit</span>
-                </div>
+                </button>
             </div>
         </div>
 
