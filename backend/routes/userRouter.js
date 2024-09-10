@@ -7,7 +7,14 @@ const { User, Account } = require("../db");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
 const { authMiddleware } = require("../middleware");
+const { uploadPhoto } = require('../cloudinary/cloud');
+const multer = require('multer');
 
+
+var uploader = multer({
+    storage : multer.diskStorage({}),
+    limits : {fileSize: 500000}
+})
 const signupBody = zod.object({
     username: zod.string(),
 	firstName: zod.string(),
@@ -141,6 +148,49 @@ router.post("/bulk", async (req, res) => {
             _id: user._id
         }))
     })
+})
+
+router.post("/updateProfilePic" , authMiddleware , uploader.single("file") , async (req ,res) => {
+    try {
+        const filePath = req.file.path; 
+        const photoUrl = await uploadPhoto(filePath);
+        if(photoUrl != null){
+            await User.updateOne(
+                {
+                    _id : req.userId,
+                },
+                {
+                    profilePic : photoUrl,
+                }
+            )
+            res.status(200).json({
+                msg: "Photo uploaded",
+                url: photoUrl
+            });
+
+        }
+      
+    } catch (error) {
+        res.status(500).json({
+            message: "Error uploading photo",
+            error: error.message
+        });
+    }
+})
+
+router.post("get-user-details" , authMiddleware , async (req , res) => {
+    const user = await User.findOne({
+        username: req.userId,
+    })
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    };
+    res.json({
+        username: user.username,
+        firstName : user.firstName,
+        lastName : user.lastName,
+        profilePic : user.profilePic == null ? '' : user.profilePic,       
+    });
 })
 
 module.exports = router;

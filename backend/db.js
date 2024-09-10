@@ -57,6 +57,9 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxLength: 50
     },
+    profilePic : {
+        type : String,
+    },
     transactions: [transactionSchema],
 }, { timestamps: true });
 
