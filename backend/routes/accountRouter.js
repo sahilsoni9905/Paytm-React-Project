@@ -31,6 +31,9 @@ router.post("/transfer", authMiddleware, async (req, res) => {
     const user = await User.findOne({
         _id : req.userId
     })
+    const userTo = await User.findOne({
+        _id : req.body.to,
+    })
     let userSubmittedPassword = req.body.password;
     if(user.password != userSubmittedPassword){
         res.status(401).json({
@@ -70,7 +73,8 @@ router.post("/transfer", authMiddleware, async (req, res) => {
         transferWithPersonName: toAccount.userId, 
         transactionAmount: amount,
         MoneySent: 1, 
-        msgAttached: req.body.msgAttached || '' 
+        msgAttached: req.body.msgAttached || '' ,
+        transferWithPersonProfilePic : userTo.profilePic || '',
     };
     await User.updateOne(
         { _id: req.userId },
@@ -85,6 +89,7 @@ router.post("/transfer", authMiddleware, async (req, res) => {
         transactionAmount: amount,
         MoneySent: 0,
         msgAttached: req.body.msgAttached || '' ,
+        transferWithPersonProfilePic : user.profilePic || '',
     };
 
     await User.updateOne(
@@ -98,19 +103,101 @@ router.post("/transfer", authMiddleware, async (req, res) => {
     });
 });
 
-router.post("/transaction-history" , authMiddleware , async (req , res) => {
-    const user = await User.findOne({
-        _id : req.userId
-    })
+router.get("/transaction-history", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findOne({
+            _id: req.userId
+        });
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
 
-    let userSubmittedPassword = req.body.password;
-    if(user.password != userSubmittedPassword){
-        res.status(401).json({
-            msg : "wrong password",
-        })
+        const transactionHistory = user.transactions.map((transaction) => {
+            return {
+                profilePic : transaction.transferWithPersonProfilePic || '', 
+                date: transaction.createdAt, 
+                type: transaction.MoneySent > 0 ? 'Sent' : 'Received', 
+                amount: transaction.transactionAmount,  
+                withPerson: transaction.transferWithPersonName,  
+                message: transaction.msgAttached || '', 
+            };
+        });
+
+      
+        res.status(200).json({
+            transactions: transactionHistory,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            msg: "Server error",
+        });
     }
-    
+});
 
-})
+const getDayName = (date) => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return days[date.getDay()];
+};
+
+const getStartOfWeek = (currentDate) => {
+    const startOfWeek = new Date(currentDate);
+    const dayOfWeek = startOfWeek.getDay();  // 0 for Sunday, 1 for Monday, etc.
+    startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek);  // Go back to the last Sunday
+    startOfWeek.setHours(0, 0, 0, 0);  // Set time to midnight
+    return startOfWeek;
+};
+
+router.get("/transaction-weekly-data", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findOne({
+            _id: req.userId
+        });
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        const currentDate = new Date();
+
+        const startOfWeek = getStartOfWeek(currentDate);
+
+        const transactionsInCurrentWeek = user.transactions.filter(transaction => {
+            const transactionDate = new Date(transaction.createdAt);
+            return transactionDate >= startOfWeek && transactionDate <= currentDate;
+        });
+
+        const weeklyData = {
+            Sun: { received: 0, sent: 0 },
+            Mon: { received: 0, sent: 0 },
+            Tue: { received: 0, sent: 0 },
+            Wed: { received: 0, sent: 0 },
+            Thu: { received: 0, sent: 0 },
+            Fri: { received: 0, sent: 0 },
+            Sat: { received: 0, sent: 0 },
+        };
+
+        transactionsInCurrentWeek.forEach(transaction => {
+            const transactionDate = new Date(transaction.createdAt);
+            const dayName = getDayName(transactionDate);  // Get the day name
+
+            if (transaction.MoneySent > 0) {
+                weeklyData[dayName].sent += transaction.transactionAmount;
+            } else {
+                weeklyData[dayName].received += transaction.transactionAmount;
+            }
+        });
+
+        res.status(200).json(weeklyData);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            msg: "Server error",
+        });
+    }
+});
+
+
 
 module.exports = router;
