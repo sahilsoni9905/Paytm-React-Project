@@ -69,11 +69,11 @@ function Pay() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-2 lg:p-4 border-2 border-slate-800 bg-slate-900 rounded-lg overflow-y-auto h-[32rem] custom-scrollbar">
         {appearedUser.length > 0 ? (
           appearedUser.map(person => (
-            <div key={person.id} className="p-4 border rounded-lg transition-all duration-300 ease-in shadow-md bg-slate-800 hover:bg-slate-700 flex justify-center flex-col items-center space-y-4">
+            <div key={person._id} className="p-4 border rounded-lg transition-all duration-300 ease-in shadow-md bg-slate-800 hover:bg-slate-700 flex justify-center flex-col items-center space-y-4">
               {person.image ? (
                 <img
                   src={person.image}
-                  alt={person.name}
+                  alt='IMG'
                   className="w-16 h-16 rounded-full object-cover"
                 />
               ) : (
