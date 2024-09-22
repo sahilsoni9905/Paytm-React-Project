@@ -145,7 +145,8 @@ router.post("/bulk", async (req, res) => {
             username: user.username,
             firstName: user.firstName,
             lastName: user.lastName,
-            _id: user._id
+            _id: user._id,
+            profilePic : user.profilePic || '',
         }))
     })
 })
