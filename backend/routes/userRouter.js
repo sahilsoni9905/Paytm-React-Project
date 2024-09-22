@@ -178,9 +178,9 @@ router.post("/updateProfilePic" , authMiddleware , uploader.single("file") , asy
     }
 })
 
-router.post("get-user-details" , authMiddleware , async (req , res) => {
+router.get("/get-user-details" , authMiddleware , async (req , res) => {
     const user = await User.findOne({
-        username: req.userId,
+        _id: req.userId,
     })
     if (!user) {
         return res.status(404).json({ message: "User not found" });

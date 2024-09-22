@@ -16,7 +16,7 @@ const Sidebar = () => {
         <div className="flex">
             <div className="hidden lg:flex flex-col bg-gray-900 text-white w-96 p-6 h-screen">
             <div className="flex items-center justify-start mb-8">
-                <span className="text-2xl font-bold">PAYLIO</span>
+                <span className="text-2xl font-bold">PAYZAR</span>
             </div>
             <div className="flex flex-col flex-1 space-y-8">
                 <NavLink 

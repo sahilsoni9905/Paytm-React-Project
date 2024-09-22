@@ -138,12 +138,12 @@ const Dashboard = () => {
                     <hr className="bg-gray-700 h-0.5 shadow-sm shadow-black  my-0.5 w-3/5  rounded-xl" />
                     <ul className="space-y-2 mt-6">
                         {notifications.map((notification, index) => (
-                            <li key={index} className="border-b border-gray-700 pb-2 flex flex-col items-center justify-center gap-4">
+                            <li key={index} className="border-b border-gray-700 pb-4 flex flex-col items-center justify-center gap-4">
                                 <div className="text-md md:text-lg lg:text-xl font-semibold">
                                     {notification.message}
                                 </div>
                                 <div className="text-sm text-gray-400 self-start">{notification.time}</div>
-                                <hr className="bg-gray-700 h-1 shadow-sm shadow-black  my-0.5 w-full  rounded-xl" />
+                                {/* <hr className="bg-gray-700 h-1 shadow-sm shadow-black  my-0.5 w-full  rounded-xl" /> */}
                             </li>
                         ))}
                     </ul>
