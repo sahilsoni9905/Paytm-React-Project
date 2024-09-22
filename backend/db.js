@@ -18,7 +18,7 @@ const transactionSchema = new mongoose.Schema({
         required: true,
     },
     transferWithPersonProfilePic : {
-        tyep : String,
+        type : String,
     },
     transactionAmount: {
         type: Number,
