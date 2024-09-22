@@ -75,6 +75,7 @@ router.post("/transfer", authMiddleware, async (req, res) => {
         MoneySent: 1, 
         msgAttached: req.body.msgAttached || '' ,
         transferWithPersonProfilePic : userTo.profilePic || '',
+        transferWithPersonId : to,
     };
     await User.updateOne(
         { _id: req.userId },
@@ -90,6 +91,7 @@ router.post("/transfer", authMiddleware, async (req, res) => {
         MoneySent: 0,
         msgAttached: req.body.msgAttached || '' ,
         transferWithPersonProfilePic : user.profilePic || '',
+        transferWithPersonId : req.userId,
     };
 
     await User.updateOne(
@@ -284,6 +286,28 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
             msg: "Server error",
         });
     }
+});
+
+router.post("/person-transaction-history" , authMiddleware , async (req , res) => {
+    const user = await User.findOne({
+        _id: req.userId
+    });
+    const userTo = await User.findOne({
+        _id : req.body.personId,
+    });
+    const transactionHistory = user.transactions.map((transaction) => {
+        if(transaction.transferWithPersonId == req.body.personId){
+        return {
+            profilePic : transaction.transferWithPersonProfilePic || '', 
+            date: transaction.createdAt, 
+            type: transaction.MoneySent > 0 ? 'Sent' : 'Received', 
+            amount: transaction.transactionAmount,    
+            message: transaction.msgAttached || '', 
+        }};
+    });
+    res.status(200).json(transactionHistory);
+
+
 });
 
 
