@@ -232,7 +232,11 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
 
         let monthReceived = 0, monthSent = 0;
         let todayReceived = 0, todaySent = 0;
-
+        if(user.transactions == null ||  user.transactions.length < 1){
+            return res.json({
+                msg : "no transaction done",
+            })
+        }
         const lastTransaction = user.transactions[user.transactions.length - 1];
 
         user.transactions.forEach(transaction => {
