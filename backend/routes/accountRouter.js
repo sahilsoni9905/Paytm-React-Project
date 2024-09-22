@@ -199,5 +199,90 @@ router.get("/transaction-weekly-data", authMiddleware, async (req, res) => {
 });
 
 
+const getStartOfMonth = (currentDate) => {
+    return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+};
+
+
+const getStartOfDay = (currentDate) => {
+    const startOfDay = new Date(currentDate);
+    startOfDay.setHours(0, 0, 0, 0);  
+    return startOfDay;
+};
+
+router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
+    try {
+      
+        const user = await User.findOne({
+            _id: req.userId
+        });
+
+     
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        const currentDate = new Date();
+
+   
+        const startOfMonth = getStartOfMonth(currentDate);
+
+      
+        const startOfDay = getStartOfDay(currentDate);
+
+        let monthReceived = 0, monthSent = 0;
+        let todayReceived = 0, todaySent = 0;
+
+        const lastTransaction = user.transactions[user.transactions.length - 1];
+
+        user.transactions.forEach(transaction => {
+            const transactionDate = new Date(transaction.createdAt);
+
+            if (transactionDate >= startOfMonth && transactionDate <= currentDate) {
+                if (transaction.MoneySent > 0) {
+                    monthSent += transaction.transactionAmount;
+                } else {
+                    monthReceived += transaction.transactionAmount;
+                }
+            }
+
+            if (transactionDate >= startOfDay && transactionDate <= currentDate) {
+                if (transaction.MoneySent > 0) {
+                    todaySent += transaction.transactionAmount;
+                } else {
+                    todayReceived += transaction.transactionAmount;
+                }
+            }
+        });
+
+        const response = {
+            currentMonth: {
+                totalSent: monthSent,
+                totalReceived: monthReceived
+            },
+            lastTransaction: lastTransaction
+                ? {
+                    amount: lastTransaction.transactionAmount,
+                    type: lastTransaction.MoneySent > 0 ? "Sent" : "Received",
+                }
+                : null, 
+            today: {
+                totalSent: todaySent,
+                totalReceived: todayReceived
+            }
+        };
+
+        res.status(200).json(response);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            msg: "Server error",
+        });
+    }
+});
+
+
+
 
 module.exports = router;
