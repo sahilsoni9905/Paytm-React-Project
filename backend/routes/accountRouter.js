@@ -28,6 +28,16 @@ router.post("/balance", authMiddleware, async (req, res) => {
 
 router.post("/transfer", authMiddleware, async (req, res) => {
     const session = await mongoose.startSession();
+    const user = await User.findOne({
+        _id : req.userId
+    })
+    let userSubmittedPassword = req.body.password;
+    if(user.password != userSubmittedPassword){
+        res.status(401).json({
+            msg : "wrong password",
+        })
+    }
+
 
     session.startTransaction();
     const { amount, to } = req.body;
@@ -87,5 +97,20 @@ router.post("/transfer", authMiddleware, async (req, res) => {
         message: "Transfer successful"
     });
 });
+
+router.post("/transaction-history" , authMiddleware , async (req , res) => {
+    const user = await User.findOne({
+        _id : req.userId
+    })
+
+    let userSubmittedPassword = req.body.password;
+    if(user.password != userSubmittedPassword){
+        res.status(401).json({
+            msg : "wrong password",
+        })
+    }
+    
+
+})
 
 module.exports = router;
