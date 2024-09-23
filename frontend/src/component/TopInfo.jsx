@@ -5,10 +5,10 @@ function TopInfo({user}) {
   return (
     <div className="flex items-center p-3 md:p-4 bg-slate-900 shadow-md">
     <div className="flex items-center gap-8">
-      {user.image ? (
+      {user.profilePic ? (
                 <img
-                  src={user.image}
-                  alt={user.name}
+                  src={user.profilePic}
+                  alt={user.firstName}
                   className="w-10 h-10 md:w-16 md:h-16 rounded-full object-cover"
                 />
               ) : (

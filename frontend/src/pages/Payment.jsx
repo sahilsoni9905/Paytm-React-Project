@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import TopInfo from '../component/TopInfo';
 import { FaPaperPlane } from 'react-icons/fa';
 import { IoMdDoneAll } from 'react-icons/io';
@@ -6,103 +6,170 @@ import { MdCurrencyRupee } from "react-icons/md";
 import { MdOutlineCancel } from 'react-icons/md';
 import { FaUserCheck } from "react-icons/fa";
 import { FaTimes } from 'react-icons/fa';
-
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';  // import toast
+import 'react-toastify/dist/ReactToastify.css'; // import toast CSS
+import 'react-toastify/dist/ReactToastify.css'; // import toast CSS
+import { Loader } from 'rsuite'; // Importing React Suite Loader
+import 'rsuite/dist/rsuite.min.css';
 function Payment() {
+  const {id} = useParams()
   const [payPopup, setPayPopup] = useState(false)
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
   const [passwordPopup, setPasswordPopup] = useState(false);
   const [password, setPassword] = useState("");
-
-  const transactions = [
-    {
-      id: 1,
-      isUser: true,
-      amount: 500,
-      status: 'Completed',
-      date: '2024-09-01',
-      time: '10:15 AM',
-      purpose: 'Grocery Shopping',
-    },
-    {
-      id: 2,
-      isUser: false,
-      amount: 1000,
-      status: 'Completed',
-      date: '2024-09-02',
-      time: '12:45 PM',
-      purpose: 'Dinner Payment',
-    },
-    {
-      id: 3,
-      isUser: true,
-      amount: 250,
-      status: 'Pending',
-      date: '2024-09-03',
-      time: '02:30 PM',
-      purpose: 'Mobile Recharge',
-    },
-    {
-      id: 4,
-      isUser: false,
-      amount: 1500,
-      status: 'Completed',
-      date: '2024-09-04',
-      time: '09:00 AM',
-      purpose: 'Rent',
-    },
-    {
-      id: 5,
-      isUser: true,
-      amount: 800,
-      status: 'Completed',
-      date: '2024-09-05',
-      time: '03:45 PM',
-      purpose: 'Utility Bills',
-    },
-    {
-      id: 6,
-      isUser: false,
-      amount: 2000,
-      status: 'Completed',
-      date: '2024-09-06',
-      time: '11:30 AM',
-      purpose: 'Loan Repayment',
-    },
-  ];
-
-  const user = {
-    username: 'anmoltripathi',
-    firstName: 'Anmol',
-    lastName: 'Tripathi',
-    image: '',
+  const [transactions,setTransactions]=useState([])
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [status,setStatus]= useState(true)
+  const historyEndRef = useRef(null);
+  const [paying, setPaying] = useState(false);
+  const [receiver,setReceiver] = useState('')
+  const fetchReceiver = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        'http://localhost:3000/api/v1/account/getReceiver',
+        { to: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data)
+      setReceiver(response.data);
+    } catch (err) {
+      console.error("Error fetching receiver:", err);
+      setError("Failed to fetch receiver.");
+    }
   };
 
-  const statusIcon = (status) => {
-    if (status === 'Completed') {
+  const fetchTransactionHistory = async () => {
+    try {
+      setLoading(true); 
+      setError(null);  
+      const token = localStorage.getItem('token'); 
+  
+      const response = await axios.post(
+        'http://localhost:3000/api/v1/account/person-transaction-history',
+        { personId: id },  
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.data.message === 'No transactions found with this person') {
+        setTransactions([]); 
+        setError('No transactions found with this person.');
+      } else {
+        setTransactions(response.data); 
+      }
+  
+    } catch (err) {
+      console.error('Error fetching transaction history:', err);
+      setError('Failed to fetch transaction history.');
+    } finally {
+      setLoading(false); 
+    }
+  };
+  
+
+  useEffect(() => {
+    if (historyEndRef.current) {
+      historyEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [transactions]);
+
+  useEffect(() => {
+    if (id) {
+      fetchReceiver()
+      fetchTransactionHistory();
+    }
+  }, [id]);
+  
+
+  const letter = (firstName) => {
+    return firstName[0].toUpperCase();
+  };
+  
+
+  const statusIcon = () => {
+    if (status===true) {
       return <IoMdDoneAll className="text-green-500" size={20} />;
     } else {
       return <MdOutlineCancel className="text-red-500" size={20} />;
     }
   };
-  const handlePay = async () => {
-    setPasswordPopup(true);
 
-  }
-  const handleContinue = () => {
-    console.log("Password entered: ", password);
-    setPasswordPopup(false);
+  const handlePay = () => {
+    setPasswordPopup(true);
+  };
+
+  const handleContinue = async () => {
+    setPasswordPopup(false)
+    setPaying(true);
+    try {
+      const token = localStorage.getItem('token'); 
+      if (!token) {
+        return setError("Authentication token not found");
+      }
+
+      const transferData = {
+        amount: Number(amount),
+        to: id,
+        password,
+        msgAttached: message, 
+      };
+
+      const response = await axios.post(
+        'http://localhost:3000/api/v1/account/transfer',
+        transferData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setPayPopup(false);
+        setPasswordPopup(false);
+        toast.success('Transfer successful!'); 
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    } catch (err) {
+      setPayPopup(false);
+      setPasswordPopup(false);
+      if (err.response) {
+        if (err.response.status === 401) {
+          toast.error("Wrong password");
+        } else if (err.response.status === 400) {
+          toast.error(err.response.data.message || "Transfer failed");
+        }
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } finally {
+      setPaying(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-white">
-      <TopInfo user={user} />
+      <TopInfo user={receiver} />
       <div className="flex-grow overflow-auto h-full bg-slate-800 p-4 sm:p-2">
         <div className="max-h-[79vh] overflow-y-auto custom-scrollbar">
-          {transactions.map((transaction) => (
+          {transactions.map((transaction,index) => (
             <div
-              key={transaction.id}
-              className={`flex ${transaction.isUser ? 'justify-end' : 'justify-start'
+            key={index}
+              className={`flex ${transaction.type ? 'justify-end' : 'justify-start'
                 } mb-4 px-3`}
             >
               <div
@@ -110,7 +177,7 @@ function Payment() {
                   }`}
               >
                 <p className="font-bold md:text-lg text-xs">
-                  {transaction.isUser ? `You Paid ${user.firstName}` : `${user.firstName} Paid You`}
+                  {transaction.isUser ? `You Paid ${receiver.firstName}` : `${receiver.firstName} Paid You`}
                 </p>
                 <p className="text-sm text-gray-400">{transaction.purpose}</p>
                 <div className="md:text-xl text-base lg:text-2xl flex items-center font-semibold md:mt-2">
@@ -126,9 +193,10 @@ function Payment() {
               </div>
             </div>
           ))}
+          <div ref={historyEndRef}></div>
         </div>
       </div>
-      <div className=" fixed bottom-0 w-full flex flex-row items-center justify-evenly p-4 sm:p-6 bg-slate-900 shadow-md">
+      <div className="fixed bottom-0 w-full flex flex-row items-center justify-evenly p-4 sm:p-6 bg-slate-900 shadow-md">
         <button onClick={() => setPayPopup(true)} className="flex items-center gap-2 sm:gap-4 font-bold text-md  lg:text-xl  bg-blue-600 text-white py-2 px-4 sm:py-3 sm:px-6 lg:py-4 lg:px-8 rounded-full hover:bg-blue-700 transition duration-200">
           <span>Send Money</span> <FaPaperPlane />
         </button>
@@ -139,7 +207,6 @@ function Payment() {
       {payPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div className="bg-slate-800 flex flex-col items-center justify-center w-96 h-auto p-8 rounded-lg relative shadow-lg space-y-6">
-            {/* Close Button */}
             <button
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-300"
               onClick={() => setPayPopup(false)}
@@ -148,14 +215,25 @@ function Payment() {
             </button>
 
             <div className="flex justify-center items-center">
-              <div className="w-16 h-16 bg-purple-400 rounded-full flex justify-center items-center text-white text-3xl">
-                S
+            {receiver.profilePic ? (
+                <img
+                  src={receiver.profilePic}
+                  alt={receiver.firstName}
+                  className="w-10 h-10 md:w-16 md:h-16 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-16 h-16 bg-purple-400 rounded-full flex justify-center items-center text-white text-3xl">
+                {letter(receiver.firstName)}
               </div>
+              )}
+                
+            
+              
             </div>
 
             <div className="text-center">
-              <h2 className="text-lg font-bold text-gray-200">Paying {' '} {user.firstName}</h2>
-              <p className="text-sm text-gray-400">@{user.username}</p>
+              <h2 className="text-lg font-bold text-gray-200">Paying {' '} {receiver.firstName}</h2>
+              <p className="text-sm text-gray-400">@{receiver.username}</p>
             </div>
 
             <div className="flex justify-center items-center space-x-2">
@@ -187,20 +265,23 @@ function Payment() {
 
             <div className="w-full flex justify-center mt-6">
               <button
-                className="bg-blue-500 w-full text-white font-semibold py-3 rounded-full hover:bg-blue-600"
+                className="bg-blue-600 text-white py-3 px-6 rounded-full hover:bg-blue-700 transition duration-200"
                 onClick={handlePay}
-                disabled={amount <= 0}
               >
-                Pay
+                Continue
               </button>
             </div>
           </div>
         </div>
       )}
+       {paying && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+          <Loader size="lg" content="Processing payment..." vertical />
+        </div>
+      )}
       {passwordPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 transition-opacity duration-300 ease-in-out">
-          <div className="bg-slate-800 w-96 p-8 rounded-lg relative shadow-lg space-y-6">
-            {/* Close Button */}
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+          <div className="bg-slate-800 w-96 h-auto p-8 rounded-lg relative shadow-lg space-y-6">
             <button
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-300"
               onClick={() => setPasswordPopup(false)}
@@ -208,27 +289,21 @@ function Payment() {
               <FaTimes size={20} />
             </button>
 
-            {/* Password Title */}
-            <div className="text-center">
-              <h2 className="text-lg font-bold text-gray-200">Enter Password</h2>
-              <p className="text-sm text-gray-400">To complete the transaction, enter your password.</p>
-            </div>
+            <h2 className="text-lg font-bold text-gray-200">Enter Your Password</h2>
 
-            {/* Password Input */}
-            <div className="flex justify-center mt-6">
+            <div className="w-full">
               <input
                 type="password"
-                placeholder="Password"
                 className="w-full py-2 px-4 bg-slate-700 text-gray-300 rounded-lg focus:outline-none focus:bg-slate-600"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
-            {/* Continue Button */}
             <div className="w-full flex justify-center mt-6">
               <button
-                className="bg-blue-500 w-full text-white font-semibold py-3 rounded-full hover:bg-blue-600"
+                className="bg-blue-600 text-white py-3 px-6 rounded-full hover:bg-blue-700 transition duration-200"
                 onClick={handleContinue}
               >
                 Continue
@@ -237,9 +312,8 @@ function Payment() {
           </div>
         </div>
       )}
-
-
-
+      
+      <ToastContainer />
     </div>
   );
 }

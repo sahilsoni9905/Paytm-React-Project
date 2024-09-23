@@ -1,5 +1,6 @@
 // backend/db.js
 const mongoose = require('mongoose');
+const { boolean } = require('zod');
 
 mongoose.connect("mongodb+srv://sahil:sahilsoni123@cluster0.8bn7b.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 
@@ -29,7 +30,7 @@ const transactionSchema = new mongoose.Schema({
         required: true,
     },
     MoneySent: {
-        type: Number,
+        type: Boolean,
         required: true,
     },
     msgAttached: {

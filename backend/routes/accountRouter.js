@@ -6,6 +6,23 @@ const { default: mongoose } = require('mongoose');
 
 const router = express.Router();
 
+router.post("/getReceiver", authMiddleware, async (req, res) => {
+    try {
+        const receiver = await User.findOne({ _id: req.body.to })
+            .select("-password -transactions");
+
+        if (!receiver) {
+            return res.status(404).json({ message: "Receiver not found" });
+        }
+
+        res.status(200).json(receiver);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
 router.post("/balance", authMiddleware, async (req, res) => {
     const account = await Account.findOne({
         userId: req.userId
@@ -28,6 +45,7 @@ router.post("/balance", authMiddleware, async (req, res) => {
 
 router.post("/transfer", authMiddleware, async (req, res) => {
     const session = await mongoose.startSession();
+    console.log("reacheduhjiiiiiiiiiiiiiiiiiiiiiiii")
     const user = await User.findOne({
         _id : req.userId
     })
@@ -40,14 +58,14 @@ router.post("/transfer", authMiddleware, async (req, res) => {
             msg : "wrong password",
         })
     }
-
+console.log('avdcajsdvfshakdvbfskd');
 
     session.startTransaction();
     const { amount, to } = req.body;
 
   
     const account = await Account.findOne({ userId: req.userId }).session(session);
-
+console.log(account)
     if (!account || account.balance < amount) {
         await session.abortTransaction();
         return res.status(400).json({
@@ -118,7 +136,7 @@ router.get("/transaction-history", authMiddleware, async (req, res) => {
             return {
                 profilePic : transaction.transferWithPersonProfilePic || '', 
                 date: transaction.createdAt, 
-                type: transaction.MoneySent > 0 ? 'Sent' : 'Received', 
+                type: transaction.MoneySent, 
                 amount: transaction.transactionAmount,  
                 withPerson: transaction.transferWithPersonName,  
                 message: transaction.msgAttached || '', 
@@ -183,7 +201,7 @@ router.get("/transaction-weekly-data", authMiddleware, async (req, res) => {
             const transactionDate = new Date(transaction.createdAt);
             const dayName = getDayName(transactionDate);  // Get the day name
 
-            if (transaction.MoneySent > 0) {
+            if (transaction.MoneySent == true) {
                 weeklyData[dayName].sent += transaction.transactionAmount;
             } else {
                 weeklyData[dayName].received += transaction.transactionAmount;
@@ -245,7 +263,7 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
             const transactionDate = new Date(transaction.createdAt);
 
             if (transactionDate >= startOfMonth && transactionDate <= currentDate) {
-                if (transaction.MoneySent > 0) {
+                if (transaction.MoneySent ==true) {
                     monthSent += transaction.transactionAmount;
                 } else {
                     monthReceived += transaction.transactionAmount;
@@ -253,7 +271,7 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
             }
 
             if (transactionDate >= startOfDay && transactionDate <= currentDate) {
-                if (transaction.MoneySent > 0) {
+                if (transaction.MoneySent ==true) {
                     todaySent += transaction.transactionAmount;
                 } else {
                     todayReceived += transaction.transactionAmount;
@@ -269,7 +287,7 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
             lastTransaction: lastTransaction
                 ? {
                     amount: lastTransaction.transactionAmount,
-                    type: lastTransaction.MoneySent > 0 ? "Sent" : "Received",
+                    type: lastTransaction.MoneySent,
                 }
                 : null, 
             today: {
@@ -288,27 +306,36 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
     }
 });
 
-router.post("/person-transaction-history" , authMiddleware , async (req , res) => {
-    const user = await User.findOne({
-        _id: req.userId
-    });
-    const userTo = await User.findOne({
-        _id : req.body.personId,
-    });
-    const transactionHistory = user.transactions.map((transaction) => {
-        if(transaction.transferWithPersonId == req.body.personId){
-        return {
-            profilePic : transaction.transferWithPersonProfilePic || '', 
-            date: transaction.createdAt, 
-            type: transaction.MoneySent > 0 ? 'Sent' : 'Received', 
-            amount: transaction.transactionAmount,    
-            message: transaction.msgAttached || '', 
-        }};
-    });
-    res.status(200).json(transactionHistory);
+router.post("/person-transaction-history", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.userId });
+        const userTo = await User.findOne({ _id: req.body.personId });
 
+        if (!user || !userTo) {
+            return res.status(404).json({ message: 'User or person not found' });
+        }
 
+        const transactionHistory = user.transactions
+            .filter(transaction => transaction.transferWithPersonId === req.body.personId)
+            .map((transaction) => ({
+                profilePic: transaction.transferWithPersonProfilePic || '', 
+                date: transaction.createdAt, 
+                type: transaction.MoneySent,  
+                amount: transaction.transactionAmount,    
+                message: transaction.msgAttached || '', 
+            }));
+            console.log(transactionHistory.length)
+            console.log(transactionHistory)
+        if (transactionHistory.length === 0) {
+            return res.status(200).json({ message: 'No transactions found with this person' });
+        }
+
+        return res.status(200).json(transactionHistory);
+    } catch (error) {
+        return res.status(500).json({ message: 'Server error', error });
+    }
 });
+
 
 
 
