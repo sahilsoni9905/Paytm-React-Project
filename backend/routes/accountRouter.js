@@ -292,12 +292,14 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
                 money_sent = user.transactions[i].transactionAmount;
                 send_to = user.transactions[i].transferWithPersonName;
                 time_sent = user.transactions[i].createdAt;
+                sent = true;
 
             } 
             if(user.transactions[i].monthSent == 0 && received == false){
                 money_received = user.transactions[i].transactionAmount;
                 received_by = user.transactions[i].transferWithPersonName;
                 time_received = user.transactions[i].createdAt;
+                received = true;
 
             }  
             if(sent == true && received == true){
