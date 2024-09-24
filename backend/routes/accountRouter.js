@@ -287,7 +287,7 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
         let time_received = 0;
         let money_received = 0;
         let received_by = '';
-        for(let i = user.transactions.length - 1; i >= 0 ; i++){
+        for(let i = user.transactions.length - 1; i >= 0 ; i--){
             if(user.transactions[i].monthSent == 1 && sent == false){
                 money_sent = user.transactions[i].transactionAmount;
                 send_to = user.transactions[i].transferWithPersonName;
