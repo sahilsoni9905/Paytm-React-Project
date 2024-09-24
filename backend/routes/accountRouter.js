@@ -279,6 +279,31 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
                 }
             }
         });
+        let  sent = false;
+        let received = false
+        let money_sent = 0;
+        let send_to = '';
+        let time_sent = 0;
+        let time_received = 0;
+        let money_received = 0;
+        let received_by = '';
+        for(let i = user.transactions.length - 1; i >= 0 ; i++){
+            if(user.transactions[i].monthSent == 1 && sent == false){
+                money_sent = user.transactions[i].transactionAmount;
+                send_to = user.transactions[i].transferWithPersonName;
+                time_sent = user.transactions[i].createdAt;
+
+            } 
+            if(user.transactions[i].monthSent == 0 && received == false){
+                money_received = user.transactions[i].transactionAmount;
+                received_by = user.transactions[i].transferWithPersonName;
+                time_received = user.transactions[i].createdAt;
+
+            }  
+            if(sent == true && received == true){
+                break;
+            }
+        }
 
         const response = {
             currentMonth: {
@@ -287,8 +312,12 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
             },
             lastTransaction: lastTransaction
                 ? {
-                    amount: lastTransaction.transactionAmount,
-                    type: lastTransaction.MoneySent,
+                    money_sent : money_sent,
+                    send_to : send_to,
+                    time_sent : time_sent,
+                     time_received : time_received,
+                     money_received : money_received,
+                     received_by  : received_by,
                 }
                 : null, 
             today: {
