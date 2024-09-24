@@ -7,7 +7,6 @@ import SignIn from './pages/Signin.jsx';
 import Pay from './component/User/Pay.jsx';
 import Transaction from './component/User/Transaction.jsx';
 import Balance from './component/User/Balance.jsx';
-import People from './component/User/People.jsx';
 import Account from './component/User/Account.jsx';
 import User from './pages/User.jsx';
 import Dashboard from './component/User/Dashboard.jsx';
@@ -26,7 +25,6 @@ function App() {
             <Route path='pay' element={<Pay />} />
             <Route path='transactions' element={<Transaction />} />
             <Route path='balance' element={<Balance />} />
-            <Route path='recipients' element={<People />} />
             <Route path='account' element={<Account />} />
           </Route>
           <Route path='/payment/:id' element={<Payment/>} />

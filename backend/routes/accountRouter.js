@@ -288,14 +288,14 @@ router.get("/dashboard-transaction-info", authMiddleware, async (req, res) => {
         let money_received = 0;
         let received_by = '';
         for(let i = user.transactions.length - 1; i >= 0 ; i--){
-            if(user.transactions[i].monthSent == 1 && sent == false){
+            if(user.transactions[i].MoneySent == 1 && sent == false){
                 money_sent = user.transactions[i].transactionAmount;
                 send_to = user.transactions[i].transferWithPersonName;
                 time_sent = user.transactions[i].createdAt;
                 sent = true;
 
             } 
-            if(user.transactions[i].monthSent == 0 && received == false){
+            if(user.transactions[i].MoneySent == 0 && received == false){
                 money_received = user.transactions[i].transactionAmount;
                 received_by = user.transactions[i].transferWithPersonName;
                 time_received = user.transactions[i].createdAt;

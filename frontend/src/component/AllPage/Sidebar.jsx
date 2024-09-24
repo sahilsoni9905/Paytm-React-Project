@@ -63,17 +63,7 @@ const Sidebar = () => {
                     <GiWallet />
                     <span className="ml-6">Check Balance</span>
                 </NavLink>
-                <NavLink 
-                    to="/user/recipients" 
-                    className={({ isActive }) => 
-                        isActive 
-                        ? 'flex items-center text-2xl font-bold bg-gray-800 p-4 rounded-lg text-blue-400'
-                        : 'flex items-center text-2xl font-bold p-4 rounded-lg hover:bg-gray-700 hover:text-blue-300'
-                    }
-                >
-                    <FaUsers />
-                    <span className="ml-6">Recipients</span>
-                </NavLink>
+                
                 <NavLink 
                     to="/user/account" 
                     className={({ isActive }) => 
@@ -131,10 +121,6 @@ const Sidebar = () => {
                         <NavLink onClick={()=>setIsOpen(false)} to="/user/balance" className="flex items-center text-xl">
                             <GiWallet />
                             <span className="ml-4">Check Balance</span>
-                        </NavLink>
-                        <NavLink onClick={()=>setIsOpen(false)} to="/user/recipients" className="flex items-center text-xl">
-                            <FaUsers />
-                            <span className="ml-4">Recipients</span>
                         </NavLink>
                         <NavLink onClick={()=>setIsOpen(false)} to="/user/account" className="flex items-center text-xl">
                             <FaUser />

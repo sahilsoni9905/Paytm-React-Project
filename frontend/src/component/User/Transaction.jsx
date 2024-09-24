@@ -45,7 +45,7 @@ function Transaction() {
   }, []);
 
   return (
-    <div className='min-h-[93.1vh] bg-black flex flex-col justify-start gap-24'>
+    <div className='min-h-[93.3vh] bg-black flex flex-col justify-start gap-24'>
       <div className='bg-slate-900 flex flex-col gap-4 p-4'>
         <h1 className='font-bold text-2xl lg:text-6xl text-slate-400'>See Your Transaction</h1>
         <h3 className='font-bold text-xl lg:text-2xl underline underline-offset-3 text-slate-400'>
@@ -53,7 +53,7 @@ function Transaction() {
         </h3>
       </div>
 
-      <div className='bg-slate-800 h-[60vh] flex flex-col overflow-y-auto mx-2 custom-scrollbar p-6 lg:mx-8 border-2 border-gray-700 rounded-lg '>
+      <div className='bg-slate-800 h-[60vh] flex flex-col-reverse overflow-y-auto mx-2 custom-scrollbar p-6 lg:mx-8 border-2 border-gray-700 rounded-lg '>
         {loading ? (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
             <Loader size="lg" content="Processing Transactions..." vertical />
