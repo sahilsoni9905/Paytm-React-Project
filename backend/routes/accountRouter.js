@@ -88,7 +88,7 @@ console.log(account)
     const transaction = {
         oldBalance: account.balance,
         newBalance: account.balance - amount,
-        transferWithPersonName: toAccount.userId, 
+        transferWithPersonName: userTo.firstName, 
         transactionAmount: amount,
         MoneySent: 1, 
         msgAttached: req.body.msgAttached || '' ,
@@ -104,7 +104,7 @@ console.log(account)
     const receiverTransaction = {
         oldBalance: toAccount.balance,
         newBalance: toAccount.balance + amount,
-        transferWithPersonName: account.userId, 
+        transferWithPersonName: user.firstName, 
         transactionAmount: amount,
         MoneySent: 0,
         msgAttached: req.body.msgAttached || '' ,
