@@ -70,9 +70,9 @@ function Pay() {
         {appearedUser.length > 0 ? (
           appearedUser.map(person => (
             <div key={person._id} className="p-4 border rounded-lg transition-all duration-300 ease-in shadow-md bg-slate-800 hover:bg-slate-700 flex justify-center flex-col items-center space-y-4">
-              {person.image ? (
+              {person.profilePic ? (
                 <img
-                  src={person.image}
+                  src={person.profilePic}
                   alt='IMG'
                   className="w-16 h-16 rounded-full object-cover"
                 />

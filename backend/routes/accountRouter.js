@@ -142,6 +142,7 @@ router.get("/transaction-history", authMiddleware, async (req, res) => {
                 message: transaction.msgAttached || '', 
             };
         });
+        console.log(transactionHistory)
 
       
         res.status(200).json({

@@ -4,13 +4,14 @@ import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { useDebounce } from 'use-debounce';
 import { useNavigate } from 'react-router-dom';
-
+import { useUser } from '../../UserContxt';
 const SearchBar = () => {
     const [show, setShow] = useState(false);
     const [searchedTerm, setSearchedTerm] = useState('');
     const [appearedUser, setAppearedUser] = useState([]);
     const [debouncedSearchedTerm] = useDebounce(searchedTerm, 200);
     const navigate=useNavigate()
+    const{user} = useUser()
 
     useEffect(() => {
         const getUser = async () => {
@@ -80,7 +81,12 @@ const SearchBar = () => {
 
             <div className='flex items-center justify-center p-2'>
                 <button onClick={() => setShow(!show)}>
-                    <FaUserCircle size={34} className="text-gray-800" />
+                    {user.profilePic===''?(<FaUserCircle size={34} className="text-gray-800" />):(<img
+                    src={user.profilePic}
+                    alt={user.firstName}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />)}
+                    
                 </button>
             </div>
 
