@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { useDebounce } from 'use-debounce';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../../UserContxt';
 const SearchBar = () => {
     const [show, setShow] = useState(false);
     const [searchedTerm, setSearchedTerm] = useState('');
     const [appearedUser, setAppearedUser] = useState([]);
     const [debouncedSearchedTerm] = useDebounce(searchedTerm, 200);
-    const navigate=useNavigate()
-    const{user} = useUser()
+    const navigate = useNavigate()
+    const { user } = useUser()
 
     useEffect(() => {
         const getUser = async () => {
@@ -20,7 +20,7 @@ const SearchBar = () => {
                     const token = localStorage.getItem('token');
                     const response = await axios.post(
                         'http://localhost:3000/api/v1/user/bulk',
-                        { filter: debouncedSearchedTerm }, 
+                        { filter: debouncedSearchedTerm },
                         {
                             headers: {
                                 Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ const SearchBar = () => {
     const handleInputChange = (e) => {
         setSearchedTerm(e.target.value);
     };
-    const LogoutHandle=()=>{
+    const LogoutHandle = () => {
         localStorage.removeItem('token');
         navigate('/')
     }
@@ -62,14 +62,17 @@ const SearchBar = () => {
                     <div className="absolute top-full left-0 w-full bg-gray-900 text-white shadow-lg rounded-lg mt-2 z-10 max-w-md sm:max-w-lg md:max-w-xl">
                         {appearedUser.map((user, index) => (
                             <div key={index}>
-                                <div
-                                    className="flex justify-between items-center px-4 py-2 hover:bg-gray-700 cursor-pointer transition-colors duration-200 ease-in-out"
-                                >
-                                    <div className="text-sm md:text-base">
-                                        <span className="font-semibold">{user.firstName} {user.lastName}</span>
-                                        <span className="block text-xs text-gray-400 md:text-sm">@{user.username}</span>
+                                <Link className='text-current no-underline' to={`/payment/${user._id}`}>
+                                    <div
+                                        className="flex justify-between items-center px-4 py-2 hover:bg-gray-700 cursor-pointer transition-colors duration-200 ease-in-out"
+                                    >
+                                        <div className="text-sm md:text-base">
+                                            <span className="font-semibold text-gray-400 ">{user.firstName} {user.lastName}</span>
+                                            <span className="block text-xs text-gray-400 md:text-sm">@{user.username}</span>
+                                        </div>
                                     </div>
-                                </div>
+                                </Link>
+
                                 {index !== appearedUser.length - 1 && (
                                     <hr className="bg-gray-700 h-0.5 mx-4 my-0.5 w-3/4 rounded-xl" />
                                 )}
@@ -81,12 +84,12 @@ const SearchBar = () => {
 
             <div className='flex items-center justify-center p-2'>
                 <button onClick={() => setShow(!show)}>
-                    {user.profilePic===''?(<FaUserCircle size={34} className="text-gray-800" />):(<img
-                    src={user.profilePic}
-                    alt={user.firstName}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />)}
-                    
+                    {user.profilePic === '' ? (<FaUserCircle size={34} className="text-gray-800" />) : (<img
+                        src={user.profilePic}
+                        alt={user.firstName}
+                        className="w-8 h-8 rounded-full object-cover"
+                    />)}
+
                 </button>
             </div>
 

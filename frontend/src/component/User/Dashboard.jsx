@@ -29,11 +29,7 @@ const data = {
     totalReceivedThisMonth: 50000
 };
 
-const notifications = [
-    { message: "Payment received from John", time: "2 hours ago" },
-    { message: "Your weekly report is ready", time: "1 day ago" },
-    { message: "Payment sent to Sarah", time: "3 days ago" },
-];
+
 
 const Dashboard = () => {
     const [weeklyData, setWeeklyData] = useState({});
@@ -44,16 +40,16 @@ const Dashboard = () => {
         datasets: []
     });
     const [transactionInfo, setTransactionInfo] = useState({});
-    const {user}= useUser()
-   
+    const { user } = useUser()
+
 
     const fetchTransactionInfo = async () => {
         try {
-            const token = localStorage.getItem('token'); 
+            const token = localStorage.getItem('token');
 
             const response = await axios.get("http://localhost:3000/api/v1/account/dashboard-transaction-info", {
                 headers: {
-                    Authorization: `Bearer ${token}`, 
+                    Authorization: `Bearer ${token}`,
                 },
             });
 
@@ -70,11 +66,16 @@ const Dashboard = () => {
             setLoading(false);
         }
     };
-
+    const notifications = [
+        { message: `Payment received from ${transactionInfo?.lastTransaction?.received_by ? transactionInfo.lastTransaction.received_by : "None"}` },
+        { message: "Your weekly report is ready" },
+        { message: `Payment sent to ${transactionInfo?.lastTransaction?.send_to ? transactionInfo.lastTransaction.send_to : "None"}` }
+    ];
+       
 
     const fetchWeeklyTransactions = async () => {
         try {
-            const token = localStorage.getItem('token'); 
+            const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:3000/api/v1/account/transaction-weekly-data', {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -137,8 +138,8 @@ const Dashboard = () => {
     }, [weeklyData, loading]);
 
     return (
-        <div className='lg:h-[93.5vh] '>
-            <div className="bg-slate-800 flex flex-col items-center justify-start  lg:h-[93.5vh] p-4">
+        <div className='lg:h-[93.3vh] '>
+            <div className="bg-slate-800 flex flex-col items-center justify-start  lg:h-[93.3vh] p-4">
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
                     <div className="lg:col-span-2 bg-gray-800 p-6 md:p-8 rounded-lg shadow-xl shadow-slate-900 text-white">
                         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 lg:mb-8">
@@ -151,12 +152,12 @@ const Dashboard = () => {
                                 <div className="flex items-center text-green-400 justify-start font-bold mb-4 sm:mb-0">
                                     <FaPlus size={20} className="mr-2" />
                                     <FaIndianRupeeSign className="mr-1" />
-                                    {data.lastReceived.toLocaleString()}
+                                    {transactionInfo.lastTransaction?.money_sent ?? 0}
                                 </div>
                                 <div className="flex items-center text-red-400 justify-start font-bold sm:justify-end">
                                     <FaMinus size={20} className="mr-2" />
                                     <FaIndianRupeeSign className="mr-1" />
-                                    {data.lastSent.toLocaleString()}
+                                    {transactionInfo.lastTransaction?.money_received ?? 0}
                                 </div>
                             </div>
                         </div>
@@ -205,7 +206,6 @@ const Dashboard = () => {
                                     <div className="text-md md:text-lg lg:text-xl font-semibold">
                                         {notification.message}
                                     </div>
-                                    <div className="text-sm text-gray-400 self-start">{notification.time}</div>
                                 </li>
                             ))}
                         </ul>
