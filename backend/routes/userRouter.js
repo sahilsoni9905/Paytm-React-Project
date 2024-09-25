@@ -101,28 +101,45 @@ router.post("/signin", async (req, res) => {
     })
 })
 
-const updateBody = zod.object({
-    password: zod.string().optional(),
-    firstName: zod.string().optional(),
-    lastName: zod.string().optional(),
-})
+
 
 router.put("/update", authMiddleware, async (req, res) => {
-    const { success, error } = updateBody.safeParse(req.body);
-    if (!success) {
-        return res.status(411).json({
-            message: "Error while updating information",
-            error: error.errors // Optional: Include specific errors from Zod
+    const { firstName, lastName } = req.body;
+
+    if (!firstName || !lastName) {
+        return res.status(400).json({
+            message: "First name and last name are required"
         });
     }
 
-    const updateResult = await User.updateOne({ _id: req.userId }, req.body);
+    try {
+        const updateResult = await User.updateOne(
+            { _id: req.userId },
+            {
+                $set: {
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim()
+                }
+            }
+        );
 
+        if (updateResult.nModified === 0) {
+            return res.status(404).json({
+                message: "No user found or no changes were made"
+            });
+        }
 
-    res.json({
-        message: "Updated successfully"
-    });
+        res.status(200).json({
+            message: "Updated successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "An error occurred while updating the information",
+            error: error.message
+        });
+    }
 });
+
 
 
 router.post("/bulk", async (req, res) => {
