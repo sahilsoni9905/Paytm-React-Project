@@ -142,7 +142,7 @@ async def get_user_details_from_backend(user_token: str):
     """
     try:
         # Get backend URL from environment variables
-        backend_base_url = os.getenv('BACKEND_URL', 'http://localhost:3000')
+        backend_base_url = os.getenv('BACKEND_URL', 'https://paytm-react-project.vercel.app/')
         backend_url = f"{backend_base_url}/api/v1/user/get-user-details"
         
         # Headers with user's token (like how you do it in frontend)
