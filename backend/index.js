@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
 require('dotenv').config({
-    path: './.env' 
+    path: './.env'
 });
+const app = express();
+const db = require("./db");
 
 const corsOptions = {
-    origin: 'http://localhost:5173', // Specify the origin
+    origin: true, // Allow all origins
     credentials: true, // Allow credentials
 };
 

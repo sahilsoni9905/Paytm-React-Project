@@ -18,12 +18,12 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    transferWithPersonProfilePic : {
-        type : String,
+    transferWithPersonProfilePic: {
+        type: String,
     },
-    transferWithPersonId : {
-        type : String , 
-        required : true,
+    transferWithPersonId: {
+        type: String,
+        required: true,
     },
     transactionAmount: {
         type: Number,
@@ -37,6 +37,26 @@ const transactionSchema = new mongoose.Schema({
         type: String,
     }
 }, { timestamps: true })
+
+const chatSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    message: {
+        type: String,
+        required: true
+    },
+    isAi: {
+        type: Boolean,
+        required: true
+    },
+    timestamp: {
+        type: Date,
+        default: Date.now
+    }
+});
 
 // Create a Schema for Users
 const userSchema = new mongoose.Schema({
@@ -65,10 +85,11 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxLength: 50
     },
-    profilePic : {
-        type : String,
+    profilePic: {
+        type: String,
     },
     transactions: [transactionSchema],
+    aiChats: [chatSchema],
 }, { timestamps: true });
 
 const accountSchema = new mongoose.Schema({
@@ -82,8 +103,6 @@ const accountSchema = new mongoose.Schema({
         required: true
     }
 });
-
-
 
 const Account = mongoose.model('Account', accountSchema);
 const User = mongoose.model('User', userSchema);

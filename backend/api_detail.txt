@@ -1,0 +1,502 @@
+================================================================================
+API DETAILS DOCUMENTATION
+================================================================================
+
+Base URL: http://localhost:3000/api/v1
+All requests should include the base URL prefix.
+
+Authentication: Some endpoints require JWT token in Authorization header as "Bearer <token>"
+
+================================================================================
+CHATBOT APIs (FastAPI - Port 9000)
+================================================================================
+Base URL: http://localhost:9000
+These are separate from the main backend APIs and run on FastAPI with Gemini AI integration.
+
+================================================================================
+14. CHAT WITH AI BOT
+================================================================================
+Endpoint: POST /chat
+Description: Main chatbot endpoint powered by Gemini AI for natural language conversations
+Authentication: Not required (but user_token needed for user-specific actions)
+
+Request Body (JSON):
+{
+    "message": "Hey, can you show me my account details?",
+    "user_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+Supported Intents:
+- get_user_details: "hey give my detail", "what's my name?", "show my info"
+- general_chat: "hello", "hi", "how are you?"
+
+Success Response (200) - User Details:
+{
+    "response": "Hello! I'd be happy to help you with your account details. Based on your profile, here's your information:\n\n👤 **Name:** John Doe\n📧 **Email:** john@example.com\n\nIs there anything specific you'd like to know more about?",
+    "action_taken": "fetched_user_details_with_ai",
+    "intent_detected": {
+        "intent": "user_details",
+        "action": "get_user_details", 
+        "confidence": "high",
+        "tone": "formal",
+        "specific_request": "user details",
+        "extracted_info": {}
+    }
+}
+
+Success Response (200) - General Chat:
+{
+    "response": "Hello! I'm your Paytm assistant. I can help you with your account details. Try asking 'What's my name?' or 'Show my info'.",
+    "action_taken": "general_conversation",
+    "intent_detected": {
+        "intent": "general",
+        "action": "general_chat",
+        "confidence": "high", 
+        "tone": "friendly"
+    }
+}
+
+Success Response (200) - Unknown Intent:
+{
+    "response": "I understand you're asking about something, but I'm still learning! \n\nRight now I can help you with:\n🔍 Your account details - Try: \"hey give my detail\" or \"what's my info?\"\n\nMore features coming soon! 🚀",
+    "action_taken": "unknown_intent",
+    "intent_detected": {
+        "intent": "...",
+        "action": "...",
+        "confidence": "..."
+    }
+}
+
+Error Response (500):
+{
+    "detail": "Something went wrong: Cannot connect to backend. Make sure your Node.js server is running on port 3000"
+}
+
+================================================================================
+15. HEALTH CHECK
+================================================================================
+Endpoint: GET /health
+Description: Check if chatbot service and AI integration are working
+
+Success Response (200):
+{
+    "status": "Chatbot is running!",
+    "message": "Your AI-powered assistant is ready to help",
+    "ai_service": "✅ Connected",
+    "features": [
+        "Natural language understanding",
+        "User details retrieval", 
+        "Conversational responses"
+    ]
+}
+
+Error Response (when AI is down):
+{
+    "status": "Chatbot is running!",
+    "message": "Your AI-powered assistant is ready to help", 
+    "ai_service": "❌ Disconnected",
+    "features": [...]
+}
+
+================================================================================
+16. DEBUG AI INTENT
+================================================================================
+Endpoint: POST /debug/intent
+Description: Debug endpoint to see what AI understands from user messages
+
+Request Body (JSON):
+{
+    "message": "hey give my detail"
+}
+
+Success Response (200):
+{
+    "user_message": "hey give my detail",
+    "ai_understanding": {
+        "intent": "user_details",
+        "action": "get_user_details",
+        "confidence": "high",
+        "tone": "casual",
+        "specific_request": "user details",
+        "extracted_info": {}
+    },
+    "explanation": "This shows exactly what the AI detected from your message"
+}
+
+Error Response (500):
+{
+    "error": "Client.__init__() got an unexpected keyword argument 'proxies'"
+}
+
+Success Response (200):
+{
+    "status": "Chatbot is running!",
+    "message": "Your AI-powered assistant is ready to help",
+    "ai_service": "✅ Connected",
+    "features": [
+        "Natural language understanding",
+        "User details retrieval",
+        "Conversational responses"
+    ]
+}
+
+================================================================================
+16. DEBUG AI INTENT
+================================================================================
+Endpoint: POST /debug/intent
+Description: Debug endpoint to test what the AI understands from messages
+
+Request Body (JSON):
+{
+    "message": "show me my details"
+}
+
+Success Response (200):
+{
+    "user_message": "show me my details",
+    "ai_understanding": {
+        "action": "get_user_details",
+        "confidence": 0.92,
+        "entities": {}
+    },
+    "explanation": "This shows exactly what the AI detected from your message"
+}
+
+================================================================================
+1. USER SIGNUP
+================================================================================
+Endpoint: POST /user/signup
+Description: Register a new user account
+Authentication: Not required
+
+Request Body (JSON):
+{
+    "username": "john@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "password": "securepassword123"
+}
+
+Success Response (201):
+{
+    "message": "User created successfully",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+Error Response (411):
+{
+    "message": "Email already taken / Incorrect inputs"
+}
+
+================================================================================
+2. USER SIGNIN
+================================================================================
+Endpoint: POST /user/signin
+Description: Login with existing credentials
+Authentication: Not required
+
+Request Body (JSON):
+{
+    "username": "john@example.com",
+    "password": "securepassword123"
+}
+
+Success Response (200):
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+Error Response (411):
+{
+    "message": "Error while logging in"
+}
+
+================================================================================
+3. UPDATE USER PROFILE
+================================================================================
+Endpoint: PUT /user/update
+Description: Update user's first and last name
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Request Body (JSON):
+{
+    "firstName": "John",
+    "lastName": "Smith"
+}
+
+Success Response (200):
+{
+    "message": "Updated successfully"
+}
+
+Error Response (400):
+{
+    "message": "First name and last name are required"
+}
+
+================================================================================
+4. GET USERS BULK
+================================================================================
+Endpoint: POST /user/bulk
+Description: Search users by username or first name
+Authentication: Not required
+
+Request Body (JSON):
+{
+    "filter": "john"
+}
+
+Success Response (200):
+{
+    "user": [
+        {
+            "username": "john@example.com",
+            "firstName": "John",
+            "lastName": "Doe",
+            "_id": "507f1f77bcf86cd799439011",
+            "profilePic": "https://cloudinary.com/image.jpg"
+        }
+    ]
+}
+
+================================================================================
+5. UPDATE PROFILE PICTURE
+================================================================================
+Endpoint: POST /user/updateProfilePic
+Description: Upload and update user's profile picture
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+Content-Type: multipart/form-data
+
+Request Body (Form Data):
+file: <image_file> (max 500KB)
+
+Success Response (200):
+{
+    "msg": "Photo uploaded",
+    "url": "https://cloudinary.com/new_image.jpg"
+}
+
+Error Response (500):
+{
+    "message": "Error uploading photo",
+    "error": "File size too large"
+}
+
+================================================================================
+6. GET USER DETAILS
+================================================================================
+Endpoint: GET /user/get-user-details
+Description: Get current user's profile information
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Success Response (200):
+{
+    "username": "john@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "profilePic": "https://cloudinary.com/image.jpg"
+}
+
+Error Response (404):
+{
+    "message": "User not found"
+}
+
+================================================================================
+7. GET RECEIVER DETAILS
+================================================================================
+Endpoint: POST /account/getReceiver
+Description: Get details of a user to send money to
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Request Body (JSON):
+{
+    "to": "507f1f77bcf86cd799439011"
+}
+
+Success Response (200):
+{
+    "_id": "507f1f77bcf86cd799439011",
+    "username": "jane@example.com",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "profilePic": "https://cloudinary.com/image.jpg"
+}
+
+Error Response (404):
+{
+    "message": "Receiver not found"
+}
+
+================================================================================
+8. GET ACCOUNT BALANCE
+================================================================================
+Endpoint: POST /account/balance
+Description: Get user's account balance (requires password verification)
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Request Body (JSON):
+{
+    "password": "securepassword123"
+}
+
+Success Response (200):
+{
+    "balance": 1500.50
+}
+
+Error Response (401):
+{
+    "msg": "password incorrect"
+}
+
+================================================================================
+9. TRANSFER MONEY
+================================================================================
+Endpoint: POST /account/transfer
+Description: Transfer money to another user
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Request Body (JSON):
+{
+    "to": "507f1f77bcf86cd799439011",
+    "amount": 100.00,
+    "password": "securepassword123",
+    "msgAttached": "Payment for lunch"
+}
+
+Success Response (200):
+{
+    "message": "Transfer successful"
+}
+
+Error Response (400):
+{
+    "message": "Insufficient balance"
+}
+
+================================================================================
+10. GET TRANSACTION HISTORY
+================================================================================
+Endpoint: GET /account/transaction-history
+Description: Get user's complete transaction history
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Success Response (200):
+{
+    "transactions": [
+        {
+            "profilePic": "https://cloudinary.com/image.jpg",
+            "date": "2023-10-04T10:30:00.000Z",
+            "type": 1,
+            "amount": 50.00,
+            "withPerson": "Jane Smith",
+            "message": "Coffee payment"
+        }
+    ]
+}
+
+================================================================================
+11. GET WEEKLY TRANSACTION DATA
+================================================================================
+Endpoint: GET /account/transaction-weekly-data
+Description: Get transaction summary for current week
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Success Response (200):
+{
+    "Sun": { "received": 0, "sent": 0 },
+    "Mon": { "received": 100, "sent": 50 },
+    "Tue": { "received": 0, "sent": 25 },
+    "Wed": { "received": 200, "sent": 0 },
+    "Thu": { "received": 0, "sent": 75 },
+    "Fri": { "received": 150, "sent": 0 },
+    "Sat": { "received": 0, "sent": 30 }
+}
+
+================================================================================
+12. GET DASHBOARD TRANSACTION INFO
+================================================================================
+Endpoint: GET /account/dashboard-transaction-info
+Description: Get dashboard statistics and recent transactions
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Success Response (200):
+{
+    "currentMonth": {
+        "totalSent": 500.00,
+        "totalReceived": 750.00
+    },
+    "lastTransaction": {
+        "money_sent": 50.00,
+        "send_to": "Jane Smith",
+        "time_sent": "2023-10-04T10:30:00.000Z",
+        "time_received": "2023-10-03T15:20:00.000Z",
+        "money_received": 100.00,
+        "received_by": "Bob Johnson"
+    },
+    "today": {
+        "totalSent": 25.00,
+        "totalReceived": 0
+    }
+}
+
+================================================================================
+13. GET PERSON TRANSACTION HISTORY
+================================================================================
+Endpoint: POST /account/person-transaction-history
+Description: Get transaction history with a specific person
+Authentication: Required (Bearer token)
+
+Headers:
+Authorization: Bearer <jwt_token>
+
+Request Body (JSON):
+{
+    "personId": "507f1f77bcf86cd799439011"
+}
+
+Success Response (200):
+[
+    {
+        "profilePic": "https://cloudinary.com/image.jpg",
+        "date": "2023-10-04T10:30:00.000Z",
+        "type": 1,
+        "amount": 50.00,
+        "message": "Lunch payment"
+    }
+]
+
+Error Response (200):
+{
+    "message": "No transactions found with this person"
+}
+
+================================================================================

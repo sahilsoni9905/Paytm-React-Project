@@ -1,0 +1,12 @@
+# Required Python packages for your AI chatbot
+# Install these by running: pip install -r requirements.txt
+
+fastapi==0.104.1
+uvicorn==0.24.0
+requests==2.31.0
+pydantic==2.5.0
+python-multipart==0.0.6
+openai>=1.40.0
+
+# Optional but recommended for development
+python-dotenv==1.0.0
