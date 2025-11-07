@@ -219,6 +219,7 @@ async def get_income_from_backend(user_token: str, date_info: dict):
             "Authorization": f"Bearer {user_token}",
             "Content-Type": "application/json"
         }
+        # hello
         
         # Build query parameters from AI extracted date info
         params = {}
