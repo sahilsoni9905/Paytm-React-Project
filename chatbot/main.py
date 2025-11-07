@@ -20,9 +20,16 @@ app = FastAPI(title="Paytm AI Chatbot", description="Intelligent chatbot with Ge
 # Allow your frontend to talk to this API (like CORS in Express)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Your React app URL
+    allow_origins=[
+        "http://localhost:3000",                                    # Local React dev server
+        "http://localhost:5173",                                    # Local Vite dev server
+        "https://paytm-react-project-jgkr.vercel.app",            # Your production frontend
+        "https://paytm-react-project.vercel.app",                 # Alternative production URL
+        "https://paytm-react-project-three.vercel.app",           # Your chatbot URL (if needed)
+        "*"                                                         # Allow all origins as fallback
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -280,6 +287,48 @@ async def debug_intent(request: dict):
         }
     except Exception as e:
         return {"error": str(e)}
+
+# Root endpoint for testing
+@app.get("/")
+async def root():
+    """Welcome endpoint to test if chatbot is running"""
+    return {
+        "message": "🤖 Paytm AI Chatbot is running!",
+        "version": "1.0.0",
+        "status": "healthy",
+        "features": ["Natural language understanding", "User details", "Expense tracking", "Income tracking"],
+        "endpoints": {
+            "chat": "POST /chat - Main chat endpoint",
+            "health": "GET /health - Health check",
+            "debug": "POST /debug/intent - Debug AI understanding"
+        }
+    }
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring"""
+    return {
+        "status": "healthy", 
+        "message": "Chatbot is running properly",
+        "timestamp": "2024-01-15T10:30:00Z"
+    }
+
+# CORS test endpoint
+@app.get("/cors-test")
+async def cors_test():
+    """Simple endpoint to test CORS configuration"""
+    return {
+        "cors": "working", 
+        "message": "If you can see this from your frontend, CORS is configured correctly!",
+        "allowed_origins": [
+            "http://localhost:3000",
+            "http://localhost:5173", 
+            "https://paytm-react-project-jgkr.vercel.app",
+            "https://paytm-react-project.vercel.app",
+            "https://paytm-react-project-three.vercel.app"
+        ]
+    }
 
 # Run the app (like app.listen() in Express)
 if __name__ == "__main__":
